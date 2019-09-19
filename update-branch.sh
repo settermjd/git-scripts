@@ -16,7 +16,7 @@ ERR_INSUFFICIENT_ARGS=85
 
 function usage()
 {
-    echo "Usage: update-branch <branch>"
+    echo "Usage: update-branch <branch name>[, <branch name>...]"
 }
 
 function get_current_branch_name()
@@ -32,9 +32,17 @@ function update_branch()
         git checkout "${branch_name}"
     fi 
 
-    git fetch && git reset --hard origin/"${branch_name}"
+    git reset --hard origin/"${branch_name}"
 }
 
-(( $# != 1 )) && usage && exit $ERR_INSUFFICIENT_ARGS
+(( $# == 0 )) && usage && exit $ERR_INSUFFICIENT_ARGS
 
-update_branch $1
+# Update the local clone of the repository
+git fetch origin
+
+for branch in "${@:1}"
+do
+    echo "Updating branch -> $branch"
+    update_branch $branch
+    echo
+done
